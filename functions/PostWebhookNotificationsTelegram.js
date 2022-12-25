@@ -15,14 +15,14 @@ exports = async function (request, response) {
     const body = JSON.parse(request.body.text());
 
     const update = body;
-    await bot.handleUpdate(update);
-
-    response.setStatusCode(200);
-    response.setBody(JSON.stringify({
-      success: {
-        message: 'Event processed successfully.',
-      },
-    }));
+    await bot.handleUpdate(update, (response) => {
+      response.setStatusCode(200);
+      response.setBody(JSON.stringify({
+        success: {
+          message: 'Event processed successfully.',
+        },
+      }));
+    });
   } catch (error) {
     response.setStatusCode(400);
     response.setBody({
