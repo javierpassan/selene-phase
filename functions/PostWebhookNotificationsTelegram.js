@@ -1,6 +1,11 @@
-const logger = console;
+import { Telegraf } from 'telegraf';
 
 exports = async function (request, response) {
+  const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
+  const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
+  bot.start((telegramContext) => telegramContext.reply('Welcome'));
+  bot.hears('hi', (telegramContext) => telegramContext.reply('Hey there'));
+
   try {
     if (request.body === undefined) {
       throw new Error('Request body was not defined.');
@@ -8,7 +13,8 @@ exports = async function (request, response) {
 
     const body = JSON.parse(request.body.text());
 
-    logger.log(JSON.stringify(body));
+    const update = body;
+    await bot.handleUpdate(update, response);
 
     response.setStatusCode(200);
     response.setBody(JSON.stringify({
