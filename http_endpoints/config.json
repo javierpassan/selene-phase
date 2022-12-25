@@ -1,6 +1,6 @@
 [
   {
-    "route": "heartbeats",
+    "route": "/heartbeats",
     "http_method": "GET",
     "function_name": "GetHeartbeats",
     "validation_method": "NO_VALIDATION",
