@@ -1,3 +1,13 @@
+function buildResponse(response) {
+  response.setStatusCode(200);
+  response.setBody(JSON.stringify({
+    success: {
+      message: 'Event processed successfully.',
+    },
+  }));
+  return response;
+}
+
 exports = async function (request, response) {
   const { Telegraf } = require('telegraf');
 
@@ -15,14 +25,7 @@ exports = async function (request, response) {
     const body = JSON.parse(request.body.text());
 
     const update = body;
-    await bot.handleUpdate(update, (response) => {
-      response.setStatusCode(200);
-      response.setBody(JSON.stringify({
-        success: {
-          message: 'Event processed successfully.',
-        },
-      }));
-    });
+    await bot.handleUpdate(update, buildResponse(response));
   } catch (error) {
     response.setStatusCode(400);
     response.setBody({
