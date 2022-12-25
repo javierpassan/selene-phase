@@ -1,6 +1,6 @@
 [
   {
-    "name": "GetRoot",
+    "name": "GetHeartbeats",
     "private": true
   }
 ]
