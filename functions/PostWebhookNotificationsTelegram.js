@@ -1,11 +1,21 @@
 function buildResponse(response) {
-  response.setStatusCode(200);
-  response.setBody(JSON.stringify({
-    success: {
-      message: 'Event processed successfully.',
+  let writableEnded = false;
+  const modRes = Object.assign(response, {
+    end: () => {
+      if (writableEnded) return;
+      response.setStatusCode(200);
+      response.setBody(JSON.stringify({
+        success: {
+          message: 'Event processed successfully.',
+        },
+      }));
+      writableEnded = true;
     },
-  }));
-  return response;
+  });
+  Object.defineProperty(modRes, 'writableEnded', {
+    get: () => writableEnded,
+  });
+  return modRes;
 }
 
 exports = async function (request, response) {
@@ -25,14 +35,7 @@ exports = async function (request, response) {
     bot.hears('hi', (telegramContext) => telegramContext.reply('Hey there'));
 
     const update = body;
-    //await bot.handleUpdate(update, buildResponse(response));
-
-    response.setStatusCode(200);
-    response.setBody(JSON.stringify({
-      success: {
-        message: 'Event processed successfully.',
-      },
-    }));
+    await bot.handleUpdate(update, buildResponse(response));
   } catch (error) {
     response.setStatusCode(400);
     response.setBody({
