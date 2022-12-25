@@ -1,0 +1,11 @@
+{
+  "name": "functions",
+  "version": "1.0.0",
+  "description": "functions",
+  "scripts": {},
+  "author": "Javier Pastor Sánchez <javierpassan@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "telegraf": "4.11.2"
+  }
+}
