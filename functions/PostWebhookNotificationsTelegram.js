@@ -15,7 +15,7 @@ exports = async function (request, response) {
     const body = JSON.parse(request.body.text());
 
     const update = body;
-    await bot.handleUpdate(update, response);
+    await bot.handleUpdate(update);
 
     response.setStatusCode(200);
     response.setBody(JSON.stringify({
