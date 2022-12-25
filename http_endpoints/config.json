@@ -12,7 +12,7 @@
   {
     "route": "/webhook-notifications/telegram",
     "http_method": "POST",
-    "function_name": "PostWebookNotificationsTelegram",
+    "function_name": "PostWebhookNotificationsTelegram",
     "validation_method": "NO_VALIDATION",
     "respond_result": true,
     "fetch_custom_user_data": false,
