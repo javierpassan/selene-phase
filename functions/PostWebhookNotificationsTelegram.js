@@ -1,23 +1,3 @@
-function buildResponse(response) {
-  let writableEnded = false;
-  const modRes = Object.assign(response, {
-    end: () => {
-      if (writableEnded) return;
-      response.setStatusCode(200);
-      response.setBody(JSON.stringify({
-        success: {
-          message: 'Event processed successfully.',
-        },
-      }));
-      writableEnded = true;
-    },
-  });
-  Object.defineProperty(modRes, 'writableEnded', {
-    get: () => writableEnded,
-  });
-  return modRes;
-}
-
 exports = async function (request, response) {
   const { Telegraf } = require('telegraf');
 
@@ -33,9 +13,17 @@ exports = async function (request, response) {
     const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
     bot.start((telegramContext) => telegramContext.reply('Welcome'));
     bot.hears('hi', (telegramContext) => telegramContext.reply('Hey there'));
+    bot.on('message', () => {});
 
     const update = body;
-    await bot.handleUpdate(update, buildResponse(response));
+    await bot.handleUpdate(update);
+
+    response.setStatusCode(200);
+    response.setBody(JSON.stringify({
+      success: {
+        message: 'Event processed successfully.',
+      },
+    }));
   } catch (error) {
     response.setStatusCode(400);
     response.setBody({
