@@ -1,5 +1,5 @@
 exports = async function (request, response) {
-  const Telegraf = require('telegraf');
+  const { Telegraf } = require('telegraf');
 
   const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
   
