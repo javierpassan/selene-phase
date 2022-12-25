@@ -1,4 +1,4 @@
-import { Telegraf } from 'telegraf';
+const Telegraf = require('telegraf')
 
 exports = async function (request, response) {
   const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
