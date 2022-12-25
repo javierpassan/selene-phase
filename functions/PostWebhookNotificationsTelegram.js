@@ -1,7 +1,8 @@
-const Telegraf = require('telegraf')
-
 exports = async function (request, response) {
+  const Telegraf = require('telegraf');
+
   const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
+  
   const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
   bot.start((telegramContext) => telegramContext.reply('Welcome'));
   bot.hears('hi', (telegramContext) => telegramContext.reply('Hey there'));
