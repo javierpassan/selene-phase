@@ -10,7 +10,7 @@
     "disabled": false
   },
   {
-    "route": "/webhook-notifications/telegram",
+    "route": "/webhook_notifications/telegram",
     "http_method": "POST",
     "function_name": "PostWebhookNotificationsTelegram",
     "validation_method": "NO_VALIDATION",
