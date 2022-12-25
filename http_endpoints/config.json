@@ -1,6 +1,6 @@
 [
   {
-    "route": "/",
+    "route": "",
     "http_method": "GET",
     "function_name": "GetRoot",
     "validation_method": "NO_VALIDATION",
