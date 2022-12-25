@@ -11,6 +11,7 @@ exports = async function (request, response) {
     logger.log(JSON.stringify(body));
 
     response.setStatusCode(204);
+    response.setBody();
   } catch (error) {
     response.setStatusCode(400);
     response.setBody(error.message);
