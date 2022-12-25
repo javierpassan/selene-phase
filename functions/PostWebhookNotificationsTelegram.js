@@ -14,7 +14,6 @@ exports = async function (request, response) {
     const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
     bot.start((telegramContext) => telegramContext.reply('Welcome'));
     bot.hears('hi', (telegramContext) => telegramContext.reply('Hey there'));
-    bot.on('message', () => {});
 
     const update = body;
     await bot.handleUpdate(update);
