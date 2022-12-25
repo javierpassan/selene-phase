@@ -1,5 +1,6 @@
 exports = async function (request, response) {
   const { Telegraf } = require('telegraf');
+  const logger = console;
 
   const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
 
@@ -25,6 +26,7 @@ exports = async function (request, response) {
       },
     }));
   } catch (error) {
+    logger.error(error.message);
     response.setStatusCode(400);
     response.setBody(JSON.stringify({
       error: {
