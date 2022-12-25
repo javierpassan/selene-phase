@@ -8,7 +8,7 @@ exports = async function (request, response) {
     
     const body = JSON.parse(request.body.text());
   
-    logger.info(JSON.stringify(body));
+    logger.log(JSON.stringify(body));
 
     response.setStatusCode(204);
   } catch (error) {
