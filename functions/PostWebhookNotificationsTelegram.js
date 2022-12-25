@@ -26,10 +26,10 @@ exports = async function (request, response) {
     }));
   } catch (error) {
     response.setStatusCode(400);
-    response.setBody({
+    response.setBody(JSON.stringify({
       error: {
         message: error.message,
       },
-    });
+    }));
   }
 }
