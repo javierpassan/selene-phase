@@ -12,10 +12,6 @@ exports = async function (request, response) {
   const { Telegraf } = require('telegraf');
 
   const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
-  
-  const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
-  bot.start((telegramContext) => telegramContext.reply('Welcome'));
-  bot.hears('hi', (telegramContext) => telegramContext.reply('Hey there'));
 
   try {
     if (request.body === undefined) {
@@ -24,8 +20,19 @@ exports = async function (request, response) {
 
     const body = JSON.parse(request.body.text());
 
+    const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
+    bot.start((telegramContext) => telegramContext.reply('Welcome'));
+    bot.hears('hi', (telegramContext) => telegramContext.reply('Hey there'));
+
     const update = body;
-    await bot.handleUpdate(update, buildResponse(response));
+    //await bot.handleUpdate(update, buildResponse(response));
+
+    response.setStatusCode(200);
+    response.setBody(JSON.stringify({
+      success: {
+        message: 'Event processed successfully.',
+      },
+    }));
   } catch (error) {
     response.setStatusCode(400);
     response.setBody({
