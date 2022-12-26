@@ -1,11 +1,9 @@
-exports = async function (request, response) {
+function createTelegramBot({ token, }) {
   const { Telegraf, Markup } = require('telegraf');
   const { message } = require('telegraf/filters');
-  const logger = console;
 
-  const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
+  const bot = new Telegraf(token);
 
-  const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
   bot.start((botContext) => botContext.reply('Welcome'));
   bot.hears('hi', (botContext) => botContext.reply('Hey there'));
   bot.command('setlocation', (botContext) => {
@@ -29,6 +27,18 @@ exports = async function (request, response) {
     return botContext.replyWithLocation(latitude, longitude, Markup.removeKeyboard(true));
   });
   bot.action('cancel', () => {});
+
+  return bot;
+}
+
+exports = async function (request, response) {
+  const logger = console;
+
+  const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
+  
+  const bot = createTelegramBot({
+    token: TELEGRAM_BOT_TOKEN,
+  })
 
   const mongoDbClient = context.services.get('mongodb-atlas');
   const db = mongoDbClient.db('selenephase');
