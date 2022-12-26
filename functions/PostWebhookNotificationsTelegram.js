@@ -1,5 +1,6 @@
 exports = async function (request, response) {
-  const { Telegraf } = require('telegraf');
+  const { Telegraf, Markup } = require('telegraf');
+  const { message } = require('telegraf/filters');
   const logger = console;
 
   const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
@@ -12,8 +13,21 @@ exports = async function (request, response) {
     const body = JSON.parse(request.body.text());
 
     const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
-    bot.start((telegramContext) => telegramContext.reply('Welcome'));
-    bot.hears('hi', (telegramContext) => telegramContext.reply('Hey there'));
+    bot.start((botContext) => botContext.reply('Welcome'));
+    bot.hears('hi', (botContext) => botContext.reply('Hey there'));
+    bot.command('setlocation', (botContext) => {
+      botContext.reply(
+        "What is your location?",
+        Markup.keyboard([
+          Markup.button.locationRequest("Send location"),
+        ]).resize(),
+      );
+    });
+    bot.on(message('location'), (botContext) => {
+      const latitude = botContext.message.locationRequest.latitude;
+      const longitude = botContext.message.locationRequest.longitude;
+      botContext.replyWithLocation(latitude, longitude);
+    })
 
     const update = body;
     await bot.handleUpdate(update);
