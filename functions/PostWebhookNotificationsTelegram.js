@@ -1,11 +1,10 @@
 function createTelegramBot({ token, }) {
-  const { Telegraf, Markup } = require('telegraf');
+  const { Telegraf } = require('telegraf');
   const bot = new Telegraf(token);
   return bot;
 }
 
 class LocationRepository {
-
   constructor(context) {
     this.context = context;
   }
@@ -13,22 +12,21 @@ class LocationRepository {
   async readLastLocationByChatId(chatId) {
     const query = {
       chatId: chatId,
-    }
-    return this.context.find(query).sort({ _id: -1 }).limit(1).toArray()[0]
+    };
+    return this.context.find(query).sort({ _id: -1 }).limit(1).toArray()[0];
   }
 
   async createLocation({ chatId, latitude, longitude, }) {
-    return this.location.insertOne({
+    return this.context.insertOne({
       chatId,
       createdOn: new Date(),
       latitude,
-      longitude
-    })
+      longitude,
+    });
   }
 }
 
 class WebhookNotificationRepository {
-
   constructor(context) {
     this.context = context;
   }
@@ -43,14 +41,17 @@ class WebhookNotificationRepository {
 }
 
 exports = async function (request, response) {
+  const { Markup } = require('telegraf');
   const { message } = require('telegraf/filters');
   const logger = console;
 
   const mongoDbClient = context.services.get('mongodb-atlas');
+  
   const locationDbContext = mongoDbClient.db('selenephase').collection('locations');
   const locationRepository = new LocationRepository(locationDbContext);
+
   const webhookNotificationDbContext = mongoDbClient.db('selenephase').collection('webhooknotifications');
-  const WebhookNotificationRepository = new WebhookNotificationRepository(webhookNotificationDbContext);
+  const webhookNotificationRepository = new WebhookNotificationRepository(webhookNotificationDbContext);
 
   const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
   const bot = createTelegramBot({
@@ -99,7 +100,7 @@ exports = async function (request, response) {
 
     const body = JSON.parse(request.body.text());
 
-    await WebhookNotificationRepository.createWebhookNotification({
+    await webhookNotificationRepository.createWebhookNotification({
       body,
       provider: 'telegram',
     });
