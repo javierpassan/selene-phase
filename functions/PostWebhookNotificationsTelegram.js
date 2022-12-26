@@ -92,6 +92,7 @@ exports = async function (request, response) {
     if (!message || !message.locationRequest) {
       return;
     }
+    logger.log(JSON.stringify(message));
     const latitude = message.locationRequest.latitude;
     const longitude = message.locationRequest.longitude;
     await locationRepository.createLocation({ chatId: message.chat.id, latitude, longitude, });
