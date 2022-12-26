@@ -28,8 +28,12 @@ exports = async function (request, response) {
       );
     });
     bot.on(message('location'), (botContext) => {
-      const latitude = botContext.message.locationRequest.latitude;
-      const longitude = botContext.message.locationRequest.longitude;
+      const message = botContext.message;
+      if (!message.locationRequest) {
+        return;
+      }
+      const latitude = message.locationRequest.latitude;
+      const longitude = message.locationRequest.longitude;
       botContext.replyWithLocation(latitude, longitude);
     })
     bot.action('cancel', () => ());
