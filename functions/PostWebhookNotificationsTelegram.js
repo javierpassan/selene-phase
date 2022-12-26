@@ -4,6 +4,66 @@ function createTelegramBot({ token, }) {
   return bot;
 }
 
+class BotService {
+  constructor(
+    client,
+    locationRepository
+  ) {
+    this.bot = client;
+    this.locationRepository = locationRepository;    
+  }
+
+  async setup() {
+    const { Markup } = require('telegraf');
+    const { message } = require('telegraf/filters');
+
+    const COMMAND_SETLOCATION = 'setlocation';
+    const COMMAND_SHOWLOCATION = 'showlocation';
+
+    this.bot.start((botContext) => botContext.reply('Welcome'));
+
+    this.bot.command(COMMAND_SETLOCATION, (botContext) => {
+      logger.log(JSON.stringify({ command: COMMAND_SETLOCATION, }));
+      return botContext.reply(
+        'What is your location?',
+        Markup
+          .keyboard([
+            Markup.button.locationRequest('Send location'),
+          ])
+          .oneTime()
+          .resize()
+      );
+    });
+    
+    this.bot.command(COMMAND_SHOWLOCATION, async (botContext) => {
+      const message = botContext.message;
+      logger.log(JSON.stringify({ command: COMMAND_SHOWLOCATION, context: { message, } }));
+      const chatId = message.chat.id;
+      const location = await this.locationRepository.readLastLocationByChatId(chatId);
+      if (!location) {
+        return botContext.reply('Location was not previously set.');
+      }
+      const latitude = location.latitude;
+      const longitude = location.longitude;
+      return botContext.replyWithLocation(latitude, longitude);
+    });
+    
+    this.bot.on(message('location'), async (botContext) => {
+      const message = botContext.message;
+      logger.log(JSON.stringify({ on: 'message:location', context: { message, } }));
+      const isSetLocationCommandReply = message.reply_to_message && message.reply_to_message.text === 'What is your location?';
+      if (!isSetLocationCommandReply) {
+        return;
+      }
+      const chatId = message.chat.id;
+      const latitude = message.location.latitude;
+      const longitude = message.location.longitude;
+      await this.locationRepository.createLocation({ chatId, latitude, longitude, });
+      return botContext.replyWithLocation(latitude, longitude);
+    });
+  }
+}
+
 class BaseRepository {
   constructor(context) {
     this.context = context
@@ -47,8 +107,6 @@ class WebhookNotificationRepository extends BaseRepository {
 }
 
 exports = async function (request, response) {
-  const { Markup } = require('telegraf');
-  const { message } = require('telegraf/filters');
   const logger = console;
 
   const DB_NAME = 'selenephase';
@@ -65,44 +123,8 @@ exports = async function (request, response) {
   const bot = createTelegramBot({
     token: TELEGRAM_BOT_TOKEN,
   })
-  bot.start((botContext) => botContext.reply('Welcome'));
-  bot.command('setlocation', (botContext) => {
-    logger.log(JSON.stringify({ command: 'setlocation', }));
-    return botContext.reply(
-      'What is your location?',
-      Markup
-        .keyboard([
-          Markup.button.locationRequest('Send location'),
-        ])
-        .oneTime()
-        .resize()
-    );
-  });
-  bot.command('showlocation', async (botContext) => {
-    const message = botContext.message;
-    logger.log(JSON.stringify({ command: 'showlocation', context: { message, } }));
-    const chatId = message.chat.id;
-    const location = await locationRepository.readLastLocationByChatId(chatId);
-    if (!location) {
-      return botContext.reply('Location was not previously set.');
-    }
-    const latitude = location.latitude;
-    const longitude = location.longitude;
-    return botContext.replyWithLocation(latitude, longitude);
-  });
-  bot.on(message('location'), async (botContext) => {
-    const message = botContext.message;
-    logger.log(JSON.stringify({ on: 'message:location', context: { message, } }));
-    const isSetLocationCommandReply = message.reply_to_message && message.reply_to_message.text === 'What is your location?';
-    if (!isSetLocationCommandReply) {
-      return;
-    }
-    const chatId = message.chat.id;
-    const latitude = message.location.latitude;
-    const longitude = message.location.longitude;
-    await locationRepository.createLocation({ chatId, latitude, longitude, });
-    return botContext.replyWithLocation(latitude, longitude);
-  });
+  const botServie = new BotService(bot, locationRepository);
+  await botServie.setup();
 
   try {
     if (request.body === undefined) {
