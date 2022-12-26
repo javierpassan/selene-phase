@@ -28,7 +28,7 @@ class LocationRepository extends BaseRepository {
     const query = {
       chatId: chatId,
     };
-    return this.context.find(query).sort({ _id: -1 }).limit(1).toArray()[0];
+    return (await this.context.find(query).sort({ _id: -1 }).limit(1).toArray())[0];
   }
 }
 
