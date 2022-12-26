@@ -66,7 +66,6 @@ exports = async function (request, response) {
     token: TELEGRAM_BOT_TOKEN,
   })
   bot.start((botContext) => botContext.reply('Welcome'));
-  bot.hears('hi', (botContext) => botContext.reply('Hey there'));
   bot.command('setlocation', (botContext) => {
     logger.log(JSON.stringify({ command: 'setlocation', }));
     return botContext.reply(
@@ -104,7 +103,6 @@ exports = async function (request, response) {
     await locationRepository.createLocation({ chatId, latitude, longitude, });
     return botContext.replyWithLocation(latitude, longitude);
   });
-  bot.action('cancel', () => { });
 
   try {
     if (request.body === undefined) {
