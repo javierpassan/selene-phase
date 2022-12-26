@@ -51,7 +51,7 @@ exports = async function (request, response) {
   const locationRepository = new LocationRepository(locationDbContext);
   const webhookNotificationDbContext = mongoDbClient.db('selenephase').collection('webhooknotifications');
   const WebhookNotificationRepository = new WebhookNotificationRepository(webhookNotificationDbContext);
-  
+
   const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
   const bot = createTelegramBot({
     token: TELEGRAM_BOT_TOKEN,
@@ -69,7 +69,7 @@ exports = async function (request, response) {
         .resize()
     );
   });
-  bot.command('showlocation'), async (botContext) => {
+  bot.command('showlocation', async (botContext) => {
     const message = botContext.message;
     const chatId = message.chat.id;
     const location = await locationRepository.readLastLocationByChatId(chatId);
