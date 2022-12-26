@@ -1,33 +1,6 @@
 function createTelegramBot({ token, }) {
   const { Telegraf, Markup } = require('telegraf');
-  const { message } = require('telegraf/filters');
-
   const bot = new Telegraf(token);
-
-  bot.start((botContext) => botContext.reply('Welcome'));
-  bot.hears('hi', (botContext) => botContext.reply('Hey there'));
-  bot.command('setlocation', (botContext) => {
-    return botContext.reply(
-      'What is your location?',
-      Markup
-        .keyboard([
-          Markup.button.locationRequest('Send location'),
-        ])
-        .oneTime()
-        .resize()
-    );
-  });
-  bot.on(message('location'), (botContext) => {
-    const message = botContext.message;
-    if (!message || !message.locationRequest) {
-      return;
-    }
-    const latitude = message.locationRequest.latitude;
-    const longitude = message.locationRequest.longitude;
-    return botContext.replyWithLocation(latitude, longitude, Markup.removeKeyboard(true));
-  });
-  bot.action('cancel', () => {});
-
   return bot;
 }
 
@@ -70,19 +43,42 @@ class WebhookNotificationRepository {
 }
 
 exports = async function (request, response) {
+  const { message } = require('telegraf/filters');
   const logger = console;
-
-  const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
-
-  const bot = createTelegramBot({
-    token: TELEGRAM_BOT_TOKEN,
-  })
 
   const mongoDbClient = context.services.get('mongodb-atlas');
   const locationDbContext = mongoDbClient.db('selenephase').collection('locations');
   const locationRepository = new LocationRepository(locationDbContext);
   const webhookNotificationDbContext = mongoDbClient.db('selenephase').collection('webhooknotifications');
   const WebhookNotificationRepository = new WebhookNotificationRepository(webhookNotificationDbContext);
+  
+  const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
+  const bot = createTelegramBot({
+    token: TELEGRAM_BOT_TOKEN,
+  })
+  bot.start((botContext) => botContext.reply('Welcome'));
+  bot.hears('hi', (botContext) => botContext.reply('Hey there'));
+  bot.command('setlocation', (botContext) => {
+    return botContext.reply(
+      'What is your location?',
+      Markup
+        .keyboard([
+          Markup.button.locationRequest('Send location'),
+        ])
+        .oneTime()
+        .resize()
+    );
+  });
+  bot.on(message('location'), (botContext) => {
+    const message = botContext.message;
+    if (!message || !message.locationRequest) {
+      return;
+    }
+    const latitude = message.locationRequest.latitude;
+    const longitude = message.locationRequest.longitude;
+    return botContext.replyWithLocation(latitude, longitude, Markup.removeKeyboard(true));
+  });
+  bot.action('cancel', () => { });
 
   try {
     if (request.body === undefined) {
