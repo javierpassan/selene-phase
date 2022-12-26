@@ -69,14 +69,15 @@ exports = async function (request, response) {
         .resize()
     );
   });
-  bot.on(message('location'), (botContext) => {
+  bot.on(message('location'), async (botContext) => {
     const message = botContext.message;
     if (!message || !message.locationRequest) {
       return;
     }
     const latitude = message.locationRequest.latitude;
     const longitude = message.locationRequest.longitude;
-    return botContext.replyWithLocation(latitude, longitude, Markup.removeKeyboard(true));
+    await locationRepository.createLocation({ chatId: message.chatId, latitude, longitude, });
+    return botContext.replyWithLocation(latitude, longitude);
   });
   bot.action('cancel', () => { });
 
