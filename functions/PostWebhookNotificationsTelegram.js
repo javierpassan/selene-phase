@@ -31,17 +31,33 @@ function createTelegramBot({ token, }) {
   return bot;
 }
 
+class WebhookNotificationRepository {
+
+  constructor(context) {
+    this.context = context;
+  }
+
+  async createWebhookNotification({ body, provider, }) {
+    return this.context.insertOne({
+      body,
+      createdOn: new Date(),
+      provider,
+    })
+  }
+}
+
 exports = async function (request, response) {
   const logger = console;
 
   const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
-  
+
   const bot = createTelegramBot({
     token: TELEGRAM_BOT_TOKEN,
   })
 
   const mongoDbClient = context.services.get('mongodb-atlas');
-  const db = mongoDbClient.db('selenephase');
+  const webhookNotificationDbContext = mongoDbClient.db('selenephase').collection('webhooknotifications');
+  const WebhookNotificationRepository = new WebhookNotificationRepository(webhookNotificationDbContext);
 
   try {
     if (request.body === undefined) {
@@ -50,9 +66,8 @@ exports = async function (request, response) {
 
     const body = JSON.parse(request.body.text());
 
-    await db.collection('webhooknotifications').insertOne({ 
-      body, 
-      createdOn: new Date(),
+    await WebhookNotificationRepository.createWebhookNotification({
+      body,
       provider: 'telegram',
     });
 
