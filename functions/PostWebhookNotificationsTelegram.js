@@ -20,14 +20,13 @@ exports = async function (request, response) {
     );
   });
   bot.on(message('location'), (botContext) => {
-    Markup.removeKeyboard(true);
     const message = botContext.message;
     if (!message || !message.locationRequest) {
       return;
     }
     const latitude = message.locationRequest.latitude;
     const longitude = message.locationRequest.longitude;
-    return botContext.replyWithLocation(latitude, longitude);
+    return botContext.replyWithLocation(latitude, longitude, Markup.removeKeyboard(true));
   });
   bot.action('cancel', () => {});
 
