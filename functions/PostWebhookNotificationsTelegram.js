@@ -68,6 +68,7 @@ exports = async function (request, response) {
   bot.start((botContext) => botContext.reply('Welcome'));
   bot.hears('hi', (botContext) => botContext.reply('Hey there'));
   bot.command('setlocation', (botContext) => {
+    logger.log(JSON.stringify({ command: 'setlocation', }));
     return botContext.reply(
       'What is your location?',
       Markup
@@ -80,7 +81,7 @@ exports = async function (request, response) {
   });
   bot.command('showlocation', async (botContext) => {
     const message = botContext.message;
-    logger.log(JSON.stringify({ command: 'showlocation', context: { message, }}));
+    logger.log(JSON.stringify({ command: 'showlocation', context: { message, } }));
     const chatId = message.chat.id;
     const location = await locationRepository.readLastLocationByChatId(chatId);
     if (!location) {
@@ -92,13 +93,14 @@ exports = async function (request, response) {
   });
   bot.on(message('location'), async (botContext) => {
     const message = botContext.message;
+    logger.log(JSON.stringify({ on: 'message:location', context: { message, } }));
     if (!message || !message.locationRequest) {
       return;
     }
-    logger.log(JSON.stringify({ on: 'message:location', context: { message, }}));
+    const chatId = message.chat.id;
     const latitude = message.locationRequest.latitude;
     const longitude = message.locationRequest.longitude;
-    await locationRepository.createLocation({ chatId: message.chat.id, latitude, longitude, });
+    await locationRepository.createLocation({ chatId, latitude, longitude, });
     return botContext.replyWithLocation(latitude, longitude);
   });
   bot.action('cancel', () => { });
