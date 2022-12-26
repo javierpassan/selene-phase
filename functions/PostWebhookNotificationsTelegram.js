@@ -30,12 +30,21 @@ exports = async function (request, response) {
   });
   bot.action('cancel', () => {});
 
+  const mongoDbClient = context.services.get('mongodb-atlas');
+  const db = mongoDbClient.db('selenephase');
+
   try {
     if (request.body === undefined) {
       throw new Error('Request body was not defined.');
     }
 
     const body = JSON.parse(request.body.text());
+
+    await db.collection('webhooknotifications').insertOne({ 
+      body, 
+      createdOn: new Date(),
+      provider: 'telegram',
+    });
 
     const update = body;
     await bot.handleUpdate(update);
