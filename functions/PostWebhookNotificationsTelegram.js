@@ -9,10 +9,10 @@ exports = async function (request, response) {
   bot.start((botContext) => botContext.reply('Welcome'));
   bot.hears('hi', (botContext) => botContext.reply('Hey there'));
   bot.command('setlocation', (botContext) => {
-    botContext.reply(
+    return botContext.reply(
       'What is your location?',
       Markup
-        .keyboard([
+        .removeKeyboard([
           Markup.button.callback('Cancel', 'cancel'),
           Markup.button.locationRequest('Send location'),
         ])
@@ -27,7 +27,7 @@ exports = async function (request, response) {
     }
     const latitude = message.locationRequest.latitude;
     const longitude = message.locationRequest.longitude;
-    botContext.replyWithLocation(latitude, longitude);
+    return botContext.replyWithLocation(latitude, longitude);
   });
   bot.action('cancel', () => {});
 
