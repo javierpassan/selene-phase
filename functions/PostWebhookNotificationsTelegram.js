@@ -12,7 +12,6 @@ exports = async function (request, response) {
     return botContext.reply(
       'What is your location?',
       Markup
-        .removeKeyboard(true)
         .keyboard([
           Markup.button.locationRequest('Send location'),
         ])
@@ -21,6 +20,7 @@ exports = async function (request, response) {
     );
   });
   bot.on(message('location'), (botContext) => {
+    Markup.removeKeyboard(true);
     const message = botContext.message;
     if (!message || !message.locationRequest) {
       return;
