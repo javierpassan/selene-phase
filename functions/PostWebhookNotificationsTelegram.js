@@ -7,9 +7,11 @@ function createTelegramBot({ token, }) {
 class BotService {
   constructor(
     client,
+    logger,
     locationRepository
   ) {
     this.bot = client;
+    this.logger = logger;
     this.locationRepository = locationRepository;    
   }
 
@@ -123,7 +125,7 @@ exports = async function (request, response) {
   const bot = createTelegramBot({
     token: TELEGRAM_BOT_TOKEN,
   })
-  const botServie = new BotService(bot, locationRepository);
+  const botServie = new BotService(bot, logger, locationRepository);
   await botServie.setup();
 
   try {
