@@ -94,12 +94,9 @@ exports = async function (request, response) {
   bot.on(message('location'), async (botContext) => {
     const message = botContext.message;
     logger.log(JSON.stringify({ on: 'message:location', context: { message, } }));
-    if (!message || !message.locationRequest) {
-      return;
-    }
     const chatId = message.chat.id;
-    const latitude = message.locationRequest.latitude;
-    const longitude = message.locationRequest.longitude;
+    const latitude = message.location.latitude;
+    const longitude = message.location.longitude;
     await locationRepository.createLocation({ chatId, latitude, longitude, });
     return botContext.replyWithLocation(latitude, longitude);
   });
