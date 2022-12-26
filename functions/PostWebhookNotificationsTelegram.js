@@ -69,6 +69,17 @@ exports = async function (request, response) {
         .resize()
     );
   });
+  bot.command('showlocation'), async (botContext) => {
+    const message = botContext.message;
+    const chatId = message.chat.id;
+    const location = await locationRepository.readLastLocationByChatId(chatId);
+    if (!location) {
+      return botContext.reply('Location was not previously set.');
+    }
+    const latitude = location.latitude;
+    const longitude = location.longitude;
+    return botContext.replyWithLocation(latitude, longitude);
+  });
   bot.on(message('location'), async (botContext) => {
     const message = botContext.message;
     if (!message || !message.locationRequest) {
@@ -76,7 +87,7 @@ exports = async function (request, response) {
     }
     const latitude = message.locationRequest.latitude;
     const longitude = message.locationRequest.longitude;
-    await locationRepository.createLocation({ chatId: message.chatId, latitude, longitude, });
+    await locationRepository.createLocation({ chatId: message.chat.id, latitude, longitude, });
     return botContext.replyWithLocation(latitude, longitude);
   });
   bot.action('cancel', () => { });
