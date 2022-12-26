@@ -94,6 +94,10 @@ exports = async function (request, response) {
   bot.on(message('location'), async (botContext) => {
     const message = botContext.message;
     logger.log(JSON.stringify({ on: 'message:location', context: { message, } }));
+    const isSetLocationCommandReply = message.reply_to_message && message.reply_to_message.text === 'What is your location?';
+    if (!isSetLocationCommandReply) {
+      return;
+    }
     const chatId = message.chat.id;
     const latitude = message.location.latitude;
     const longitude = message.location.longitude;
