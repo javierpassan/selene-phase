@@ -31,6 +31,29 @@ function createTelegramBot({ token, }) {
   return bot;
 }
 
+class LocationRepository {
+
+  constructor(context) {
+    this.context = context;
+  }
+
+  async readLastLocationByChatId(chatId) {
+    const query = {
+      chatId: chatId,
+    }
+    return this.context.find(query).sort({ _id: -1 }).limit(1).toArray()[0]
+  }
+
+  async createLocation({ chatId, latitude, longitude, }) {
+    return this.location.insertOne({
+      chatId,
+      createdOn: new Date(),
+      latitude,
+      longitude
+    })
+  }
+}
+
 class WebhookNotificationRepository {
 
   constructor(context) {
@@ -56,6 +79,8 @@ exports = async function (request, response) {
   })
 
   const mongoDbClient = context.services.get('mongodb-atlas');
+  const locationDbContext = mongoDbClient.db('selenephase').collection('locations');
+  const locationRepository = new LocationRepository(locationDbContext);
   const webhookNotificationDbContext = mongoDbClient.db('selenephase').collection('webhooknotifications');
   const WebhookNotificationRepository = new WebhookNotificationRepository(webhookNotificationDbContext);
 
