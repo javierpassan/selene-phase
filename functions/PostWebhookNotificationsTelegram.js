@@ -17,10 +17,14 @@ exports = async function (request, response) {
     bot.hears('hi', (botContext) => botContext.reply('Hey there'));
     bot.command('setlocation', (botContext) => {
       botContext.reply(
-        "What is your location?",
-        Markup.keyboard([
-          Markup.button.locationRequest("Send location"),
-        ]).resize(),
+        'What is your location?',
+        Markup
+          .keyboard([
+            Markup.button.callback('Cancel', 'cancel'),
+            Markup.button.locationRequest('Send location'),
+          ])
+          .oneTime()
+          .resize()
       );
     });
     bot.on(message('location'), (botContext) => {
@@ -28,6 +32,7 @@ exports = async function (request, response) {
       const longitude = botContext.message.locationRequest.longitude;
       botContext.replyWithLocation(latitude, longitude);
     })
+    bot.action('cancel', () => ());
 
     const update = body;
     await bot.handleUpdate(update);
