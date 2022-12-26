@@ -5,38 +5,38 @@ exports = async function (request, response) {
 
   const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
 
+  const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
+  bot.start((botContext) => botContext.reply('Welcome'));
+  bot.hears('hi', (botContext) => botContext.reply('Hey there'));
+  bot.command('setlocation', (botContext) => {
+    botContext.reply(
+      'What is your location?',
+      Markup
+        .keyboard([
+          Markup.button.callback('Cancel', 'cancel'),
+          Markup.button.locationRequest('Send location'),
+        ])
+        .oneTime()
+        .resize()
+    );
+  });
+  bot.on(message('location'), (botContext) => {
+    const message = botContext.message;
+    if (!message || !message.locationRequest) {
+      return;
+    }
+    const latitude = message.locationRequest.latitude;
+    const longitude = message.locationRequest.longitude;
+    botContext.replyWithLocation(latitude, longitude);
+  });
+  bot.action('cancel', () => {});
+
   try {
     if (request.body === undefined) {
       throw new Error('Request body was not defined.');
     }
 
     const body = JSON.parse(request.body.text());
-
-    const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
-    bot.start((botContext) => botContext.reply('Welcome'));
-    bot.hears('hi', (botContext) => botContext.reply('Hey there'));
-    bot.command('setlocation', (botContext) => {
-      botContext.reply(
-        'What is your location?',
-        Markup
-          .keyboard([
-            Markup.button.callback('Cancel', 'cancel'),
-            Markup.button.locationRequest('Send location'),
-          ])
-          .oneTime()
-          .resize()
-      );
-    });
-    bot.on(message('location'), (botContext) => {
-      const message = botContext.message;
-      if (!message.locationRequest) {
-        return;
-      }
-      const latitude = message.locationRequest.latitude;
-      const longitude = message.locationRequest.longitude;
-      botContext.replyWithLocation(latitude, longitude);
-    })
-    bot.action('cancel', () => ());
 
     const update = body;
     await bot.handleUpdate(update);
