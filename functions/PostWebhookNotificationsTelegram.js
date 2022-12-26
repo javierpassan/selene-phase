@@ -51,15 +51,17 @@ exports = async function (request, response) {
   const { message } = require('telegraf/filters');
   const logger = console;
 
+  const DB_NAME = 'selenephase';
+  const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
+
   const mongoDbClient = context.services.get('mongodb-atlas');
 
-  const locationDbContext = mongoDbClient.db('selenephase').collection('locations');
+  const locationDbContext = mongoDbClient.db(DB_NAME).collection('locations');
   const locationRepository = new LocationRepository(locationDbContext);
 
-  const webhookNotificationDbContext = mongoDbClient.db('selenephase').collection('webhooknotifications');
+  const webhookNotificationDbContext = mongoDbClient.db(DB_NAME).collection('webhooknotifications');
   const webhookNotificationRepository = new WebhookNotificationRepository(webhookNotificationDbContext);
 
-  const TELEGRAM_BOT_TOKEN = context.values.get('TELEGRAM_BOT_TOKEN');
   const bot = createTelegramBot({
     token: TELEGRAM_BOT_TOKEN,
   })
