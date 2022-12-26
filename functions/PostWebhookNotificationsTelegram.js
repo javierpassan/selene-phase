@@ -25,7 +25,7 @@ class BotService {
     this.bot.start((botContext) => botContext.reply('Welcome'));
 
     this.bot.command(COMMAND_SETLOCATION, (botContext) => {
-      logger.log(JSON.stringify({ command: COMMAND_SETLOCATION, }));
+      this.logger.log(JSON.stringify({ command: COMMAND_SETLOCATION, }));
       return botContext.reply(
         'What is your location?',
         Markup
@@ -39,7 +39,7 @@ class BotService {
     
     this.bot.command(COMMAND_SHOWLOCATION, async (botContext) => {
       const message = botContext.message;
-      logger.log(JSON.stringify({ command: COMMAND_SHOWLOCATION, context: { message, } }));
+      this.logger.log(JSON.stringify({ command: COMMAND_SHOWLOCATION, context: { message, } }));
       const chatId = message.chat.id;
       const location = await this.locationRepository.readLastLocationByChatId(chatId);
       if (!location) {
@@ -52,7 +52,7 @@ class BotService {
     
     this.bot.on(message('location'), async (botContext) => {
       const message = botContext.message;
-      logger.log(JSON.stringify({ on: 'message:location', context: { message, } }));
+      this.logger.log(JSON.stringify({ on: 'message:location', context: { message, } }));
       const isSetLocationCommandReply = message.reply_to_message && message.reply_to_message.text === 'What is your location?';
       if (!isSetLocationCommandReply) {
         return;
