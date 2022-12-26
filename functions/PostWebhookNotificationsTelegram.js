@@ -12,10 +12,12 @@ exports = async function (request, response) {
     return botContext.reply(
       'What is your location?',
       Markup
-        .inlineKeyboard([
-          Markup.button.callback('Cancel', 'cancel'),
+        .removeKeyboard(true)
+        .keyboard([
           Markup.button.locationRequest('Send location'),
         ])
+        .oneTime()
+        .resize()
     );
   });
   bot.on(message('location'), (botContext) => {
