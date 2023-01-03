@@ -6,6 +6,7 @@
   "author": "Javier Pastor Sánchez <javierpassan@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "selene-phase-domain": "1.0.0-alpha.1",
     "telegraf": "4.11.2"
   }
 }
