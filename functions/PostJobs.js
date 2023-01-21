@@ -7,7 +7,9 @@ exports = async function (request, response) {
 
     const body = JSON.parse(request.body.text());
 
-    const useCaseRequest = { body, };
+    const useCaseRequest = { 
+      name: body.name, 
+    };
 
     const validJobs = [
       'CommandSendMoonPhaseMessages',
