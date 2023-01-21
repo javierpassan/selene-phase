@@ -8,6 +8,7 @@ exports = async function () {
   const {
     LocationMongoDbAtlasRepository,
     SendMoonPhaseMessagesUseCase,
+    MoonPhaseEventMongoDbAtlasRepository,
   } = require('selene-phase-domain');
 
   const logger = console;
@@ -17,12 +18,15 @@ exports = async function () {
 
   const mongoDbClient = context.services.get('mongodb-atlas');
 
+  const moonPhaseEventDbContext = mongoDbClient.db(DB_NAME).collection('moonphaseevents');
+  const moonPhaseEventRepository = new MoonPhaseEventMongoDbAtlasRepository(moonPhaseEventDbContext);
+  
   const locationDbContext = mongoDbClient.db(DB_NAME).collection('locations');
   const locationRepository = new LocationMongoDbAtlasRepository(locationDbContext);
 
   const bot = createTelegramBot({ token: TELEGRAM_BOT_TOKEN, });
   
-  const sendMoonPhaseMessageUseCase = new SendMoonPhaseMessagesUseCase(bot, locationRepository);
+  const sendMoonPhaseMessageUseCase = new SendMoonPhaseMessagesUseCase(bot, moonPhaseEventRepository, locationRepository);
 
   try {
     await sendMoonPhaseMessageUseCase.invoke();
