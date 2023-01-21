@@ -1,0 +1,16 @@
+{
+  "name": "SendMoonPhaseMessagesTrigger",
+  "type": "SCHEDULED",
+  "config": {
+    "schedule": "0 13 ? * *",
+    "skip_catchup_events": false
+  },
+  "disabled": false,
+  "event_processors": {
+    "FUNCTION": {
+      "config": {
+        "function_name": "CommandSendMoonPhaseMessages"
+      }
+    }
+  }
+}
