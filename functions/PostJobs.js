@@ -8,6 +8,14 @@ exports = async function (request, response) {
     const body = JSON.parse(request.body.text());
 
     const useCaseRequest = { body, };
+
+    const validJobs = [
+      'CommandSendMoonPhaseMessages',
+    ];
+    if (!validJobs.includes(useCaseRequest.name)) {
+      throw new Error('Job not valid');
+    }
+
     await context.functions.execute(useCaseRequest.name);
 
     response.setStatusCode(200);
