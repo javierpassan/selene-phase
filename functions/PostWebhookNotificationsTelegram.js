@@ -6,6 +6,7 @@ function createTelegramBot({ token, }) {
 
 exports = async function (request, response) {
   const {
+    HandleTelegramUpdateUseCase,
     LocationMongoDbAtlasRepository,
     TelegramTelegrafBot,
     WebhookNotificationMongoDbAtlasRepository,
@@ -24,11 +25,12 @@ exports = async function (request, response) {
   const webhookNotificationDbContext = mongoDbClient.db(DB_NAME).collection('webhooknotifications');
   const webhookNotificationRepository = new WebhookNotificationMongoDbAtlasRepository(webhookNotificationDbContext);
 
-  const bot = createTelegramBot({
-    token: TELEGRAM_BOT_TOKEN,
-  })
-  const botServie = new TelegramTelegrafBot(bot, logger, locationRepository);
-  await botServie.setup();
+  const bot = createTelegramBot({ token: TELEGRAM_BOT_TOKEN, });
+  
+  const botService = new TelegramTelegrafBot(bot, locationRepository, logger);
+  await botService.setup();
+
+  const handleTelegramUpdateUseCase = new HandleTelegramUpdateUseCase(bot, webhookNotificationRepository);
 
   try {
     if (request.body === undefined) {
@@ -37,13 +39,8 @@ exports = async function (request, response) {
 
     const body = JSON.parse(request.body.text());
 
-    await webhookNotificationRepository.createWebhookNotification({
-      body,
-      provider: 'telegram',
-    });
-
-    const update = body;
-    await bot.handleUpdate(update);
+    const request = { body, };
+    await handleTelegramUpdateUseCase.invoke(request);
 
     response.setStatusCode(200);
     response.setBody(JSON.stringify({
