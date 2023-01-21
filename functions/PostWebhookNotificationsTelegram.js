@@ -39,8 +39,8 @@ exports = async function (request, response) {
 
     const body = JSON.parse(request.body.text());
 
-    const request = { body, };
-    await handleTelegramUpdateUseCase.invoke(request);
+    const useCaseRequest = { body, };
+    await handleTelegramUpdateUseCase.invoke(useCaseRequest);
 
     response.setStatusCode(200);
     response.setBody(JSON.stringify({
